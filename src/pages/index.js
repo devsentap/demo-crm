@@ -43,9 +43,9 @@ const IndexPage = () => {
       txtName:       '',
       txtMobile:     '',
       txtAddress:    '',
-      txtProductIDs: ''      
+      txtProductIDs: ''
     });
-
+    
     const url = `https://funccrm.azurewebsites.net/api/insertCustomer?code=caODt9/saABTSUsx0c52fxKLWHvznE1xeFaNXlLrhe2v4uCVS1mwBg==&id=${id}&email=${email}&name=${name}&mobile=${mobile}&address=${address}&product_ids=${product_ids}&source=${source}&created=${created}`;
     console.log('url', url);
     try {
@@ -57,7 +57,26 @@ const IndexPage = () => {
     }
   }
 
-  async function updateCustomer(data, e) {}
+  async function updateCustomer(data, e) {
+    const id          = data.txtEmail.trim();
+    const email       = data.txtEmail.trim();
+    const name        = data.txtName.trim();
+    const mobile      = data.txtMobile.trim();
+    const address     = data.txtAddress.trim();
+    const product_ids = data.txtProductIDs.trim();
+    const source      = data.ddSource.trim();    
+    const created     = new Date().toUTCString();
+    
+    const url = `https://funccrm.azurewebsites.net/api/updateCustomer?code=JdjKnsGTm/ItXpjf3rGdIym46sivS59slYNSSFrQ8mqPcvuyvof6bw==&id=${id}&email=${email}&name=${name}&mobile=${mobile}&address=${address}&product_ids=${product_ids}&source=${source}&created=${created}`;
+    console.log('url', url);
+    try {
+      const result = await axios.put(url);
+      getCustomers();
+      console.log('result updateFreelancer', result);
+    } catch (error) {
+      console.log('[ERROR]', error);
+    }
+  }
 
   async function removeCustomer(data, e) {}
 
@@ -102,7 +121,51 @@ const IndexPage = () => {
     return <tbody>{trHTMLs}</tbody>;
   }
 
-  function toggleActiveRow(e) {}
+  function toggleActiveRow(e) {
+    // ignore table header, why would we want to select table header anyways :)
+    if (e.target.parentNode.parentNode.tagName === 'THEAD') return;
+    
+    // we only allow one active row
+    // if target not selected yet, find and remove all other selected, then just toggle the target
+    // if target already selected, just toggle the target
+    var klass_name = 'is-selected';
+    if (e.target.parentNode.classList.contains(klass_name) === false) {
+      document.getElementById('tblCustomers').querySelectorAll(`tr.${klass_name}`)
+        .forEach(function(e) { e.classList.remove(klass_name); });      
+    }
+    e.target.parentNode.classList.toggle(klass_name);
+    resetOrFillForm();    
+
+    function resetOrFillForm() {
+      if (e.target.parentNode.classList.contains(klass_name) === false) {
+        setDisableTxtEmail(false);
+        setDisableBtnAdd(false);
+        setDisableBtnUpdate(true);
+        setDisableBtnRemove(true); 
+        reset({
+          txtEmail:      '',
+          txtName:       '',
+          txtMobile:     '',
+          txtAddress:    '',
+          txtProductIDs: ''
+        });
+      } else {
+        setDisableTxtEmail(true);
+        setDisableBtnAdd(true);
+        setDisableBtnUpdate(false);
+        setDisableBtnRemove(false);
+        Array.from(e.target.parentNode.children).forEach(function (td, index) {          
+          switch (index) {
+            case 0: setValue('txtEmail',      td.innerText); break;
+            case 1: setValue('txtName',       td.innerText); break;
+            case 2: setValue('txtMobile',     td.innerText); break;
+            case 3: setValue('txtAddress',    td.innerText); break;
+            case 4: setValue('txtProductIDs', td.innerText); break;
+          }
+        });
+      }
+    }
+  }
 
   return (
     <Section>
