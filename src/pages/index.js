@@ -72,13 +72,41 @@ const IndexPage = () => {
     try {
       const result = await axios.put(url);
       getCustomers();
-      console.log('result updateFreelancer', result);
+      console.log('result updateCustomer', result);
     } catch (error) {
       console.log('[ERROR]', error);
     }
   }
 
-  async function removeCustomer(data, e) {}
+  async function removeCustomer(data, e) {    
+    const id     = data.txtEmail.trim();
+    const email  = data.txtEmail.trim();
+
+    const url = `https://funccrm.azurewebsites.net/api/removeCustomer?code=d0rYwt2PuIVJkAXNO7PO9rt3Chsk9JhJLUnI/Nl6wo27gq6uWYuptg==&id=${id}&email=${email}`;
+    try {
+      const result = await axios.delete(url);
+      getCustomers();
+      console.log('result removeCustomer', result);      
+    } catch (error) {
+      console.log('[ERROR]', error);
+    }
+
+    // deselect all selected rows, and reset form    
+    var klass_name = 'is-selected';
+    document.getElementById('tblCustomers').querySelectorAll(`tr.${klass_name}`)
+      .forEach(function(e) { e.classList.remove(klass_name); });
+    setDisableTxtEmail(false);
+    setDisableBtnAdd(false);
+    setDisableBtnUpdate(true);
+    setDisableBtnRemove(true);    
+    reset({
+      txtEmail:      '',
+      txtName:       '',
+      txtMobile:     '',
+      txtAddress:    '',
+      txtProductIDs: ''
+    });
+  }
 
   function renderColumnNames() {
     return (
